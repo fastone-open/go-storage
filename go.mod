@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/storage v1.31.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/Azure/azure-storage-file-go v0.8.0
-	github.com/BurntSushi/toml v0.3.1
+	github.com/BurntSushi/toml v1.3.2
 	github.com/Xuanwo/gg v0.3.0
 	github.com/Xuanwo/templateutils v0.2.0
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.7+incompatible
