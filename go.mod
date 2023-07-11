@@ -25,7 +25,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.23.4+incompatible
 	github.com/jlaffaye/ftp v0.2.0
-	github.com/kevinburke/go-bindata v3.22.0+incompatible
+	github.com/kevinburke/go-bindata v3.24.0+incompatible
 	github.com/minio/minio-go/v7 v7.0.59
 	github.com/pelletier/go-toml v1.9.4
 	github.com/pengsrc/go-shared v0.2.1-0.20190131101655-1999055a4a14
