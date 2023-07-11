@@ -39,7 +39,7 @@ require (
 	github.com/urfave/cli/v2 v2.3.0
 	go.beyondstorage.io/v5 v5.0.0
 	golang.org/x/oauth2 v0.9.0
-	golang.org/x/sys v0.9.0
+	golang.org/x/sys v0.10.0
 	google.golang.org/api v0.129.0
 	storj.io/uplink v1.10.0
 )
