@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	"github.com/fastone-open/go-storage/types"
@@ -16,4 +17,12 @@ func setupTest(t *testing.T) types.Storager {
 		t.Errorf("new storager: %v", err)
 	}
 	return store
+}
+
+func TestService(t *testing.T) {
+	servicer, err := memory.NewServicer()
+	require.NoError(t, err)
+	store, err := servicer.Create("demo")
+	require.NoError(t, err)
+	t.Log(store)
 }

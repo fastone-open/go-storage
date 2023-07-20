@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/fastone-open/go-storage/pairs"
-	"github.com/fastone-open/go-storage/pkg/httpclient"
-	"github.com/fastone-open/go-storage/services"
-	. "github.com/fastone-open/go-storage/types"
+	. "go.beyondstorage.io/v5/pairs"
+	"go.beyondstorage.io/v5/pkg/httpclient"
+	"go.beyondstorage.io/v5/services"
+	. "go.beyondstorage.io/v5/types"
 )
 
 var (

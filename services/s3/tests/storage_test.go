@@ -49,7 +49,6 @@ func TestHTTPSigner(t *testing.T) {
 	// tests.TestMultipartHTTPSigner(t, setupTest(t)) is not supported
 }
 
-// https://git.fastonetech.com/fastone/go-storage/issues/741
 func TestIssue741(t *testing.T) {
 	if os.Getenv("STORAGE_S3_INTEGRATION_TEST") != "on" {
 		t.Skipf("STORAGE_S3_INTEGRATION_TEST is not 'on', skipped")

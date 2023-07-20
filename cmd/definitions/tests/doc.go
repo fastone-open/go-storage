@@ -6,4 +6,4 @@ If the test failed, the generator SHOULD NOT be used in specific service.
 
 package tests
 
-//go:generate go run -tags tools git.fastonetech.com/fastone/go-storage/cmd/definitions --debug service.toml
+//go:generate go run -tags tools github.com/fastone-open/go-storage/cmd/definitions --debug service.toml
