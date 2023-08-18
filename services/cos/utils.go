@@ -12,6 +12,7 @@ import (
 	ps "github.com/fastone-open/go-storage/pairs"
 	"github.com/fastone-open/go-storage/services"
 	typ "github.com/fastone-open/go-storage/types"
+	"github.com/tencentyun/cos-go-sdk-v5"
 )
 
 // Service is the Tencent oss *Service config.

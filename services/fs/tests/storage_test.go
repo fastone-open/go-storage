@@ -4,8 +4,29 @@ import (
 	"os"
 	"testing"
 
+	ps "github.com/fastone-open/go-storage/pairs"
+	"github.com/fastone-open/go-storage/services"
+	fs "github.com/fastone-open/go-storage/services/fs"
 	"github.com/fastone-open/go-storage/tests"
+	"github.com/stretchr/testify/require"
 )
+
+func TestService(t *testing.T) {
+	servicer, err := fs.NewServicer(ps.WithWorkDir("/tmp/hello"))
+	require.NoError(t, err)
+	store, err := servicer.Create("demo")
+	require.NoError(t, err)
+	t.Log(store)
+}
+
+func TestService2(t *testing.T) {
+	servicer, err := services.NewServicerFromString("fs:///tmp/storage-store/gaia-bucket/dev?credential=hmac::&endpoint=")
+	require.NoError(t, err)
+	store, err := servicer.Create("demo")
+	require.NoError(t, err)
+	t.Log(store)
+
+}
 
 func TestStorage(t *testing.T) {
 	if os.Getenv("STORAGE_FS_INTEGRATION_TEST") != "on" {

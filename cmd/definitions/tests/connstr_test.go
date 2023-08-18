@@ -118,7 +118,7 @@ func TestFromString(t *testing.T) {
 			[]Pair{
 				pairs.WithName("abc"),
 				pairs.WithWorkDir("/tmp"),
-				WithEnableLoosePair(),
+				pairs.WithEnableLoosePair(),
 			},
 			nil,
 		},

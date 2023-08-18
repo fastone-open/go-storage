@@ -58,7 +58,7 @@ func (s *Storage) createAppend(ctx context.Context, path string, opt pairStorage
 	}
 
 	_, err = s.bucket.NewAppendBlobURL(rp).Create(ctx, headers, nil,
-		azblob.BlobAccessConditions{}, nil, cpk)
+		azblob.BlobAccessConditions{}, nil, cpk, azblob.ImmutabilityPolicyOptions{})
 	if err != nil {
 		return
 	}
@@ -91,7 +91,7 @@ func (s *Storage) createDir(ctx context.Context, path string, opt pairStorageCre
 	_, err = s.bucket.NewBlockBlobURL(rp).Upload(
 		ctx, iowrap.SizedReadSeekCloser(nil, 0), azblob.BlobHTTPHeaders{},
 		azblob.Metadata{}, azblob.BlobAccessConditions{},
-		accessTier, azblob.BlobTagsMap{}, azblob.ClientProvidedKeyOptions{})
+		accessTier, azblob.BlobTagsMap{}, azblob.ClientProvidedKeyOptions{}, azblob.ImmutabilityPolicyOptions{})
 	if err != nil {
 		return
 	}
@@ -390,7 +390,7 @@ func (s *Storage) write(ctx context.Context, path string, r io.Reader, size int6
 	_, err = s.bucket.NewBlockBlobURL(rp).Upload(
 		ctx, iowrap.SizedReadSeekCloser(r, size),
 		headers, azblob.Metadata{}, azblob.BlobAccessConditions{},
-		accessTier, azblob.BlobTagsMap{}, cpk)
+		accessTier, azblob.BlobTagsMap{}, cpk, azblob.ImmutabilityPolicyOptions{})
 	if err != nil {
 		return 0, err
 	}

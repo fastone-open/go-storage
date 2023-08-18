@@ -13,6 +13,7 @@ import (
 	ps "github.com/fastone-open/go-storage/pairs"
 	"github.com/fastone-open/go-storage/services"
 	"github.com/fastone-open/go-storage/types"
+	. "github.com/fastone-open/go-storage/types"
 )
 
 // Storage is the example client.
@@ -27,7 +28,7 @@ type Storage struct {
 	types.UnimplementedStorager
 	types.UnimplementedDirer
 	types.UnimplementedMover
-	types.UnimplementedAppender
+	// types.UnimplementedAppender
 }
 
 // String implements Storager.String

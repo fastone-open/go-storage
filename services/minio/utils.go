@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
 	"github.com/fastone-open/go-storage/credential"

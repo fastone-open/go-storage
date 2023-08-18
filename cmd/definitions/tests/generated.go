@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	. "go.beyondstorage.io/v5/pairs"
-	"go.beyondstorage.io/v5/pkg/httpclient"
-	"go.beyondstorage.io/v5/services"
-	. "go.beyondstorage.io/v5/types"
+	. "github.com/fastone-open/go-storage/pairs"
+	"github.com/fastone-open/go-storage/pkg/httpclient"
+	"github.com/fastone-open/go-storage/services"
+	. "github.com/fastone-open/go-storage/types"
 )
 
 var (
@@ -75,8 +75,6 @@ func setStorageSystemMetadata(s *StorageMeta, sm StorageSystemMetadata) {
 }
 
 // WithDefaultServicePairs will apply default_service_pairs value to Options.
-//
-// set default pairs for service actions
 func WithDefaultServicePairs(v DefaultServicePairs) Pair {
 	return Pair{Key: "default_service_pairs", Value: v}
 }
@@ -87,8 +85,6 @@ func WithDefaultStorageClass(v string) Pair {
 }
 
 // WithDefaultStoragePairs will apply default_storage_pairs value to Options.
-//
-// set default pairs for storager actions
 func WithDefaultStoragePairs(v DefaultStoragePairs) Pair {
 	return Pair{Key: "default_storage_pairs", Value: v}
 }
@@ -98,35 +94,7 @@ func WithDisableURICleaning() Pair {
 	return Pair{Key: "disable_uri_cleaning", Value: true}
 }
 
-// WithEnableLoosePair will apply enable_loose_pair value to Options.
-//
-// loose_pair feature is designed for users who don't want strict pair checks.
-//
-// If this feature is enabled, the service will not return an error for not support pairs.
-//
-// This feature was introduced in GSP-109.
-func WithEnableLoosePair() Pair {
-	return Pair{Key: "enable_loose_pair", Value: true}
-}
-
-// WithEnableVirtualDir will apply enable_virtual_dir value to Options.
-//
-// virtual_dir feature is designed for a service that doesn't have native dir support but wants to
-// provide simulated operations.
-//
-// - If this feature is disabled (the default behavior), the service will behave like it doesn't have
-// any dir support.
-// - If this feature is enabled, the service will support simulated dir behavior in create_dir, create,
-// list, delete, and so on.
-//
-// This feature was introduced in GSP-109.
-func WithEnableVirtualDir() Pair {
-	return Pair{Key: "enable_virtual_dir", Value: true}
-}
-
 // WithServiceFeatures will apply service_features value to Options.
-//
-// set service features
 func WithServiceFeatures(v ServiceFeatures) Pair {
 	return Pair{Key: "service_features", Value: v}
 }
@@ -137,8 +105,6 @@ func WithStorageClass(v string) Pair {
 }
 
 // WithStorageFeatures will apply storage_features value to Options.
-//
-// set storage features
 func WithStorageFeatures(v StorageFeatures) Pair {
 	return Pair{Key: "storage_features", Value: v}
 }
@@ -150,11 +116,8 @@ func WithStringPair(v string) Pair {
 	return Pair{Key: "string_pair", Value: v}
 }
 
-var pairMap = map[string]string{"content_md5": "string", "content_type": "string", "context": "context.Context", "continuation_token": "string", "credential": "string", "default_content_type": "string", "default_io_callback": "func([]byte)", "default_service_pairs": "DefaultServicePairs", "default_storage_class": "string", "default_storage_pairs": "DefaultStoragePairs", "disable_uri_cleaning": "bool", "enable_loose_pair": "bool", "enable_virtual_dir": "bool", "endpoint": "string", "expire": "time.Duration", "http_client_options": "*httpclient.Options", "interceptor": "Interceptor", "io_callback": "func([]byte)", "list_mode": "ListMode", "location": "string", "multipart_id": "string", "name": "string", "object_mode": "ObjectMode", "offset": "int64", "service_features": "ServiceFeatures", "size": "int64", "storage_class": "string", "storage_features": "StorageFeatures", "string_pair": "string", "work_dir": "string"}
+var pairMap = map[string]string{"content_md5": "string", "content_type": "string", "context": "context.Context", "continuation_token": "string", "credential": "string", "default_content_type": "string", "default_io_callback": "func([]byte)", "default_service_pairs": "DefaultServicePairs", "default_storage_class": "string", "default_storage_pairs": "DefaultStoragePairs", "disable_uri_cleaning": "bool", "endpoint": "string", "expire": "time.Duration", "http_client_options": "*httpclient.Options", "interceptor": "Interceptor", "io_callback": "func([]byte)", "list_mode": "ListMode", "location": "string", "multipart_id": "string", "name": "string", "object_mode": "ObjectMode", "offset": "int64", "service_features": "ServiceFeatures", "size": "int64", "storage_class": "string", "storage_features": "StorageFeatures", "string_pair": "string", "work_dir": "string"}
 var _ Servicer = &Service{}
-
-type ServiceFeatures struct {
-}
 
 // pairServiceNew is the parsed struct
 type pairServiceNew struct {
@@ -224,13 +187,6 @@ func parsePairServiceNew(opts []Pair) (pairServiceNew, error) {
 	return result, nil
 }
 
-// DefaultServicePairs is default pairs for specific action
-type DefaultServicePairs struct {
-	Create []Pair
-	Delete []Pair
-	Get    []Pair
-	List   []Pair
-}
 type pairServiceCreate struct {
 	pairs []Pair
 	// Required pairs
@@ -427,26 +383,8 @@ var (
 	_ Fetcher     = &Storage{}
 	_ Mover       = &Storage{}
 	_ Multiparter = &Storage{}
-	_ Reacher     = &Storage{}
 	_ Storager    = &Storage{}
 )
-
-type StorageFeatures struct { // loose_pair feature is designed for users who don't want strict pair checks.
-	// If this feature is enabled, the service will not return an error for not support pairs.
-	//
-	// This feature was introduced in GSP-109.
-	LoosePair bool
-	// virtual_dir feature is designed for a service that doesn't have native dir support but wants to
-	// provide simulated operations.
-	//
-	// - If this feature is disabled (the default behavior), the service will behave like it doesn't have
-	// any dir support.
-	// - If this feature is enabled, the service will support simulated dir behavior in create_dir, create,
-	// list, delete, and so on.
-	//
-	// This feature was introduced in GSP-109.
-	VirtualDir bool
-}
 
 // pairStorageNew is the parsed struct
 type pairStorageNew struct {
@@ -475,10 +413,6 @@ type pairStorageNew struct {
 	HasWorkDir             bool
 	WorkDir                string
 	// Enable features
-	hasEnableLoosePair  bool
-	EnableLoosePair     bool
-	hasEnableVirtualDir bool
-	EnableVirtualDir    bool
 }
 
 // parsePairStorageNew will parse Pair slice into *pairStorageNew
@@ -548,29 +482,10 @@ func parsePairStorageNew(opts []Pair) (pairStorageNew, error) {
 			}
 			result.HasWorkDir = true
 			result.WorkDir = v.Value.(string)
-		case "enable_loose_pair":
-			if result.hasEnableLoosePair {
-				continue
-			}
-			result.hasEnableLoosePair = true
-			result.EnableLoosePair = true
-		case "enable_virtual_dir":
-			if result.hasEnableVirtualDir {
-				continue
-			}
-			result.hasEnableVirtualDir = true
-			result.EnableVirtualDir = true
 		}
 	}
 	// Enable features
-	if result.hasEnableLoosePair {
-		result.HasStorageFeatures = true
-		result.StorageFeatures.LoosePair = true
-	}
-	if result.hasEnableVirtualDir {
-		result.HasStorageFeatures = true
-		result.StorageFeatures.VirtualDir = true
-	}
+
 	// Default pairs
 	if result.HasDefaultContentType {
 		result.HasDefaultStoragePairs = true
@@ -591,27 +506,6 @@ func parsePairStorageNew(opts []Pair) (pairStorageNew, error) {
 	return result, nil
 }
 
-// DefaultStoragePairs is default pairs for specific action
-type DefaultStoragePairs struct {
-	CommitAppend      []Pair
-	CompleteMultipart []Pair
-	Copy              []Pair
-	Create            []Pair
-	CreateAppend      []Pair
-	CreateMultipart   []Pair
-	Delete            []Pair
-	Fetch             []Pair
-	List              []Pair
-	ListMultipart     []Pair
-	Metadata          []Pair
-	Move              []Pair
-	Reach             []Pair
-	Read              []Pair
-	Stat              []Pair
-	Write             []Pair
-	WriteAppend       []Pair
-	WriteMultipart    []Pair
-}
 type pairStorageCommitAppend struct {
 	pairs []Pair
 	// Required pairs
@@ -625,11 +519,6 @@ func (s *Storage) parsePairStorageCommitAppend(opts []Pair) (pairStorageCommitAp
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageCommitAppend{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -650,11 +539,6 @@ func (s *Storage) parsePairStorageCompleteMultipart(opts []Pair) (pairStorageCom
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageCompleteMultipart{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -675,11 +559,6 @@ func (s *Storage) parsePairStorageCopy(opts []Pair) (pairStorageCopy, error) {
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageCopy{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -708,11 +587,6 @@ func (s *Storage) parsePairStorageCreate(opts []Pair) (pairStorageCreate, error)
 			result.HasObjectMode = true
 			result.ObjectMode = v.Value.(ObjectMode)
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageCreate{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -733,11 +607,6 @@ func (s *Storage) parsePairStorageCreateAppend(opts []Pair) (pairStorageCreateAp
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageCreateAppend{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -758,11 +627,6 @@ func (s *Storage) parsePairStorageCreateMultipart(opts []Pair) (pairStorageCreat
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageCreateMultipart{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -799,11 +663,6 @@ func (s *Storage) parsePairStorageDelete(opts []Pair) (pairStorageDelete, error)
 			result.HasObjectMode = true
 			result.ObjectMode = v.Value.(ObjectMode)
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageDelete{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -824,11 +683,6 @@ func (s *Storage) parsePairStorageFetch(opts []Pair) (pairStorageFetch, error) {
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageFetch{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -857,11 +711,6 @@ func (s *Storage) parsePairStorageList(opts []Pair) (pairStorageList, error) {
 			result.HasListMode = true
 			result.ListMode = v.Value.(ListMode)
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageList{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -882,11 +731,6 @@ func (s *Storage) parsePairStorageListMultipart(opts []Pair) (pairStorageListMul
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageListMultipart{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -907,11 +751,6 @@ func (s *Storage) parsePairStorageMetadata(opts []Pair) (pairStorageMetadata, er
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageMetadata{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -932,50 +771,10 @@ func (s *Storage) parsePairStorageMove(opts []Pair) (pairStorageMove, error) {
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageMove{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
 
-	return result, nil
-}
-
-type pairStorageReach struct {
-	pairs []Pair
-	// Required pairs
-	HasExpire bool
-	Expire    time.Duration
-	// Optional pairs
-}
-
-func (s *Storage) parsePairStorageReach(opts []Pair) (pairStorageReach, error) {
-	result :=
-		pairStorageReach{pairs: opts}
-
-	for _, v := range opts {
-		switch v.Key {
-		case "expire":
-			if result.HasExpire {
-				continue
-			}
-			result.HasExpire = true
-			result.Expire = v.Value.(time.Duration)
-		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
-			return pairStorageReach{}, services.PairUnsupportedError{Pair: v}
-		}
-	}
-	if !result.HasExpire {
-		return pairStorageReach{}, services.PairRequiredError{Keys: []string{"expire"}}
-	}
 	return result, nil
 }
 
@@ -1016,11 +815,6 @@ func (s *Storage) parsePairStorageRead(opts []Pair) (pairStorageRead, error) {
 			result.HasSize = true
 			result.Size = v.Value.(int64)
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageRead{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -1049,11 +843,6 @@ func (s *Storage) parsePairStorageStat(opts []Pair) (pairStorageStat, error) {
 			result.HasObjectMode = true
 			result.ObjectMode = v.Value.(ObjectMode)
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageStat{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -1106,11 +895,6 @@ func (s *Storage) parsePairStorageWrite(opts []Pair) (pairStorageWrite, error) {
 			result.HasStorageClass = true
 			result.StorageClass = v.Value.(string)
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageWrite{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -1131,11 +915,6 @@ func (s *Storage) parsePairStorageWriteAppend(opts []Pair) (pairStorageWriteAppe
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageWriteAppend{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -1156,11 +935,6 @@ func (s *Storage) parsePairStorageWriteMultipart(opts []Pair) (pairStorageWriteM
 	for _, v := range opts {
 		switch v.Key {
 		default:
-			// loose_pair feature introduced in GSP-109.
-			// If user enable this feature, service should ignore not support pair error.
-			if s.features.LoosePair {
-				continue
-			}
 			return pairStorageWriteMultipart{}, services.PairUnsupportedError{Pair: v}
 		}
 	}
@@ -1381,25 +1155,6 @@ func (s *Storage) MoveWithContext(ctx context.Context, src string, dst string, p
 		return
 	}
 	return s.move(ctx, strings.ReplaceAll(src, "\\", "/"), strings.ReplaceAll(dst, "\\", "/"), opt)
-}
-func (s *Storage) Reach(path string, pairs ...Pair) (url string, err error) {
-	ctx := context.Background()
-	return s.ReachWithContext(ctx, path, pairs...)
-}
-func (s *Storage) ReachWithContext(ctx context.Context, path string, pairs ...Pair) (url string, err error) {
-	defer func() {
-		err =
-			s.formatError("reach", err, path)
-	}()
-
-	pairs = append(pairs, s.defaultPairs.Reach...)
-	var opt pairStorageReach
-
-	opt, err = s.parsePairStorageReach(pairs)
-	if err != nil {
-		return
-	}
-	return s.reach(ctx, strings.ReplaceAll(path, "\\", "/"), opt)
 }
 func (s *Storage) Read(path string, w io.Writer, pairs ...Pair) (n int64, err error) {
 	ctx := context.Background()

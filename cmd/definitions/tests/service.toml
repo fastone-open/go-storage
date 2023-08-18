@@ -2,7 +2,7 @@ name = "tests"
 
 [namespace.service.new]
 required = ["credential"]
-optional = ["service_features", "default_service_pairs", "endpoint", "http_client_options"]
+optional = ["endpoint", "http_client_options"]
 
 [namespace.service.op.create]
 required = ["location"]
@@ -17,12 +17,12 @@ optional = ["location"]
 optional = ["location"]
 
 [namespace.storage]
-features = ["virtual_dir", "loose_pair"]
-implement = ["copier", "fetcher", "mover", "multiparter", "reacher", "appender"]
+# features = ["virtual_dir", "loose_pair"]
+implement = ["copier", "fetcher", "mover", "multiparter", "appender"]
 
 [namespace.storage.new]
 required = ["name"]
-optional = ["storage_features", "default_storage_pairs", "disable_uri_cleaning", "http_client_options", "location", "work_dir"]
+optional = [ "disable_uri_cleaning", "http_client_options", "location", "work_dir"]
 
 [namespace.storage.op.delete]
 optional = ["multipart_id", "object_mode"]
@@ -30,8 +30,8 @@ optional = ["multipart_id", "object_mode"]
 [namespace.storage.op.list]
 optional = ["list_mode"]
 
-[namespace.storage.op.reach]
-required = ["expire"]
+# [namespace.storage.op.reach]
+# required = ["expire"]
 
 [namespace.storage.op.read]
 optional = ["io_callback", "size", "offset"]

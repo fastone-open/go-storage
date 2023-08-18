@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	. "go.beyondstorage.io/v5/pairs"
-	"go.beyondstorage.io/v5/pkg/httpclient"
-	"go.beyondstorage.io/v5/services"
-	. "go.beyondstorage.io/v5/types"
+	. "github.com/fastone-open/go-storage/pairs"
+	"github.com/fastone-open/go-storage/pkg/httpclient"
+	"github.com/fastone-open/go-storage/services"
+	. "github.com/fastone-open/go-storage/types"
 )
 
 var (
@@ -88,9 +88,6 @@ var (
 	_ Mover    = &Storage{}
 	_ Storager = &Storage{}
 )
-
-type StorageFeatures struct {
-}
 
 // pairStorageNew is the parsed struct
 type pairStorageNew struct {
@@ -176,18 +173,6 @@ func parsePairStorageNew(opts []Pair) (pairStorageNew, error) {
 	return result, nil
 }
 
-// DefaultStoragePairs is default pairs for specific action
-type DefaultStoragePairs struct {
-	Create    []Pair
-	CreateDir []Pair
-	Delete    []Pair
-	List      []Pair
-	Metadata  []Pair
-	Move      []Pair
-	Read      []Pair
-	Stat      []Pair
-	Write     []Pair
-}
 type pairStorageCreate struct {
 	pairs []Pair
 	// Required pairs

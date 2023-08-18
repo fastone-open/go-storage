@@ -14,6 +14,7 @@ import (
 	"github.com/fastone-open/go-storage/pkg/iowrap"
 	"github.com/fastone-open/go-storage/services"
 	"github.com/fastone-open/go-storage/types"
+	"github.com/tencentyun/cos-go-sdk-v5"
 )
 
 func (s *Storage) completeMultipart(ctx context.Context, o *types.Object, parts []*types.Part, opt pairStorageCompleteMultipart) (err error) {

@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	. "go.beyondstorage.io/v5/pairs"
-	"go.beyondstorage.io/v5/pkg/httpclient"
-	"go.beyondstorage.io/v5/services"
-	. "go.beyondstorage.io/v5/types"
+	. "github.com/fastone-open/go-storage/pairs"
+	"github.com/fastone-open/go-storage/pkg/httpclient"
+	"github.com/fastone-open/go-storage/services"
+	. "github.com/fastone-open/go-storage/types"
 )
 
 var (
@@ -108,34 +108,6 @@ func WithDisableURICleaning() Pair {
 	return Pair{Key: "disable_uri_cleaning", Value: true}
 }
 
-// WithEnableVirtualDir will apply enable_virtual_dir value to Options.
-//
-// virtual_dir feature is designed for a service that doesn't have native dir support but wants to
-// provide simulated operations.
-//
-// - If this feature is disabled (the default behavior), the service will behave like it doesn't have
-// any dir support.
-// - If this feature is enabled, the service will support simulated dir behavior in create_dir, create,
-// list, delete, and so on.
-//
-// This feature was introduced in GSP-109.
-func WithEnableVirtualDir() Pair {
-	return Pair{Key: "enable_virtual_dir", Value: true}
-}
-
-// WithEnableVirtualLink will apply enable_virtual_link value to Options.
-//
-// virtual_link feature is designed for a service that doesn't have native support for link.
-//
-// - If this feature is enabled, the service will run compatible mode: create link via native methods,
-// but allow read link from old-style link object.
-// - If this feature is not enabled, the service will run in native as other service.
-//
-// This feature was introduced in GSP-86.
-func WithEnableVirtualLink() Pair {
-	return Pair{Key: "enable_virtual_link", Value: true}
-}
-
 // WithEncryptionCustomerAlgorithm will apply encryption_customer_algorithm value to Options.
 //
 // specifies the encryption algorithm. Only AES256 is supported now.
@@ -165,11 +137,8 @@ func WithStorageFeatures(v StorageFeatures) Pair {
 	return Pair{Key: "storage_features", Value: v}
 }
 
-var pairMap = map[string]string{"content_md5": "string", "content_type": "string", "context": "context.Context", "continuation_token": "string", "copy_source_encryption_customer_algorithm": "string", "copy_source_encryption_customer_key": "[]byte", "credential": "string", "default_content_type": "string", "default_io_callback": "func([]byte)", "default_service_pairs": "DefaultServicePairs", "default_storage_pairs": "DefaultStoragePairs", "disable_uri_cleaning": "bool", "enable_virtual_dir": "bool", "enable_virtual_link": "bool", "encryption_customer_algorithm": "string", "encryption_customer_key": "[]byte", "endpoint": "string", "expire": "time.Duration", "http_client_options": "*httpclient.Options", "interceptor": "Interceptor", "io_callback": "func([]byte)", "list_mode": "ListMode", "location": "string", "multipart_id": "string", "name": "string", "object_mode": "ObjectMode", "offset": "int64", "service_features": "ServiceFeatures", "size": "int64", "storage_class": "string", "storage_features": "StorageFeatures", "work_dir": "string"}
+var pairMap = map[string]string{"content_md5": "string", "content_type": "string", "context": "context.Context", "continuation_token": "string", "copy_source_encryption_customer_algorithm": "string", "copy_source_encryption_customer_key": "[]byte", "credential": "string", "default_content_type": "string", "default_io_callback": "func([]byte)", "default_service_pairs": "DefaultServicePairs", "default_storage_pairs": "DefaultStoragePairs", "disable_uri_cleaning": "bool", "encryption_customer_algorithm": "string", "encryption_customer_key": "[]byte", "endpoint": "string", "expire": "time.Duration", "http_client_options": "*httpclient.Options", "interceptor": "Interceptor", "io_callback": "func([]byte)", "list_mode": "ListMode", "location": "string", "multipart_id": "string", "name": "string", "object_mode": "ObjectMode", "offset": "int64", "service_features": "ServiceFeatures", "size": "int64", "storage_class": "string", "storage_features": "StorageFeatures", "work_dir": "string"}
 var _ Servicer = &Service{}
-
-type ServiceFeatures struct {
-}
 
 // pairServiceNew is the parsed struct
 type pairServiceNew struct {
@@ -239,13 +208,6 @@ func parsePairServiceNew(opts []Pair) (pairServiceNew, error) {
 	return result, nil
 }
 
-// DefaultServicePairs is default pairs for specific action
-type DefaultServicePairs struct {
-	Create []Pair
-	Delete []Pair
-	Get    []Pair
-	List   []Pair
-}
 type pairServiceCreate struct {
 	pairs []Pair
 	// Required pairs
@@ -448,26 +410,6 @@ var (
 	_ Storager          = &Storage{}
 )
 
-type StorageFeatures struct { // virtual_dir feature is designed for a service that doesn't have native dir support but wants to
-	// provide simulated operations.
-	//
-	// - If this feature is disabled (the default behavior), the service will behave like it doesn't have
-	// any dir support.
-	// - If this feature is enabled, the service will support simulated dir behavior in create_dir, create,
-	// list, delete, and so on.
-	//
-	// This feature was introduced in GSP-109.
-	VirtualDir bool
-	// virtual_link feature is designed for a service that doesn't have native support for link.
-	//
-	// - If this feature is enabled, the service will run compatible mode: create link via native methods,
-	// but allow read link from old-style link object.
-	// - If this feature is not enabled, the service will run in native as other service.
-	//
-	// This feature was introduced in GSP-86.
-	VirtualLink bool
-}
-
 // pairStorageNew is the parsed struct
 type pairStorageNew struct {
 	pairs []Pair
@@ -493,10 +435,6 @@ type pairStorageNew struct {
 	HasWorkDir             bool
 	WorkDir                string
 	// Enable features
-	hasEnableVirtualDir  bool
-	EnableVirtualDir     bool
-	hasEnableVirtualLink bool
-	EnableVirtualLink    bool
 }
 
 // parsePairStorageNew will parse Pair slice into *pairStorageNew
@@ -560,29 +498,10 @@ func parsePairStorageNew(opts []Pair) (pairStorageNew, error) {
 			}
 			result.HasWorkDir = true
 			result.WorkDir = v.Value.(string)
-		case "enable_virtual_dir":
-			if result.hasEnableVirtualDir {
-				continue
-			}
-			result.hasEnableVirtualDir = true
-			result.EnableVirtualDir = true
-		case "enable_virtual_link":
-			if result.hasEnableVirtualLink {
-				continue
-			}
-			result.hasEnableVirtualLink = true
-			result.EnableVirtualLink = true
 		}
 	}
 	// Enable features
-	if result.hasEnableVirtualDir {
-		result.HasStorageFeatures = true
-		result.StorageFeatures.VirtualDir = true
-	}
-	if result.hasEnableVirtualLink {
-		result.HasStorageFeatures = true
-		result.StorageFeatures.VirtualLink = true
-	}
+
 	// Default pairs
 	if result.HasDefaultContentType {
 		result.HasDefaultStoragePairs = true
@@ -602,31 +521,6 @@ func parsePairStorageNew(opts []Pair) (pairStorageNew, error) {
 	return result, nil
 }
 
-// DefaultStoragePairs is default pairs for specific action
-type DefaultStoragePairs struct {
-	CommitAppend        []Pair
-	CompleteMultipart   []Pair
-	Copy                []Pair
-	Create              []Pair
-	CreateAppend        []Pair
-	CreateDir           []Pair
-	CreateLink          []Pair
-	CreateMultipart     []Pair
-	Delete              []Pair
-	Fetch               []Pair
-	List                []Pair
-	ListMultipart       []Pair
-	Metadata            []Pair
-	Move                []Pair
-	QuerySignHTTPDelete []Pair
-	QuerySignHTTPRead   []Pair
-	QuerySignHTTPWrite  []Pair
-	Read                []Pair
-	Stat                []Pair
-	Write               []Pair
-	WriteAppend         []Pair
-	WriteMultipart      []Pair
-}
 type pairStorageCommitAppend struct {
 	pairs []Pair
 	// Required pairs

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [v5.0.0] - 2021-10-15
 
-Since this release, we will use `go.beyondstorage.io/v5` as new module name.
+Since this release, we will use `github.com/fastone-open/go-storage` as new module name.
 
 ### Added
 

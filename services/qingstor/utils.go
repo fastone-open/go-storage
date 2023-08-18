@@ -33,8 +33,8 @@ type Service struct {
 
 	client *http.Client
 
-	defaultPairs DefaultServicePairs
-	features     ServiceFeatures
+	defaultPairs typ.DefaultServicePairs
+	features     typ.ServiceFeatures
 
 	typ.UnimplementedServicer
 }
@@ -53,8 +53,8 @@ type Storage struct {
 	config     *qsconfig.Config
 	properties *service.Properties
 
-	defaultPairs DefaultStoragePairs
-	features     StorageFeatures
+	defaultPairs typ.DefaultStoragePairs
+	features     typ.StorageFeatures
 
 	// options for this storager.
 	workDir string // workDir dir for all operation.

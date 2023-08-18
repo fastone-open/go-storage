@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	. "go.beyondstorage.io/v5/pairs"
-	"go.beyondstorage.io/v5/pkg/httpclient"
-	"go.beyondstorage.io/v5/services"
-	. "go.beyondstorage.io/v5/types"
+	. "github.com/fastone-open/go-storage/pairs"
+	"github.com/fastone-open/go-storage/pkg/httpclient"
+	"github.com/fastone-open/go-storage/services"
+	. "github.com/fastone-open/go-storage/types"
 )
 
 var (
@@ -84,9 +84,6 @@ func WithStorageFeatures(v StorageFeatures) Pair {
 
 var pairMap = map[string]string{"content_md5": "string", "content_type": "string", "context": "context.Context", "continuation_token": "string", "credential": "string", "default_content_type": "string", "default_io_callback": "func([]byte)", "default_storage_pairs": "DefaultStoragePairs", "endpoint": "string", "expire": "time.Duration", "http_client_options": "*httpclient.Options", "interceptor": "Interceptor", "io_callback": "func([]byte)", "list_mode": "ListMode", "location": "string", "multipart_id": "string", "name": "string", "object_mode": "ObjectMode", "offset": "int64", "size": "int64", "storage_features": "StorageFeatures", "work_dir": "string"}
 var _ Storager = &Storage{}
-
-type StorageFeatures struct {
-}
 
 // pairStorageNew is the parsed struct
 type pairStorageNew struct {
@@ -178,16 +175,6 @@ func parsePairStorageNew(opts []Pair) (pairStorageNew, error) {
 	return result, nil
 }
 
-// DefaultStoragePairs is default pairs for specific action
-type DefaultStoragePairs struct {
-	Create   []Pair
-	Delete   []Pair
-	List     []Pair
-	Metadata []Pair
-	Read     []Pair
-	Stat     []Pair
-	Write    []Pair
-}
 type pairStorageCreate struct {
 	pairs []Pair
 	// Required pairs

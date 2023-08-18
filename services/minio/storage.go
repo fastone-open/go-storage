@@ -10,6 +10,7 @@ import (
 	"github.com/fastone-open/go-storage/pkg/iowrap"
 	"github.com/fastone-open/go-storage/services"
 	"github.com/fastone-open/go-storage/types"
+	"github.com/minio/minio-go/v7"
 )
 
 const defaultListObjectBufferSize = 100

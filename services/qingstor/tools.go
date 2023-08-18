@@ -4,5 +4,5 @@
 package qingstor
 
 import (
-	_ "go.beyondstorage.io/v5/cmd/definitions"
+	_ "github.com/fastone-open/go-storage/cmd/definitions"
 )

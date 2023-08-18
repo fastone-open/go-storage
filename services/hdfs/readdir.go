@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/colinmarc/hdfs/v2"
-	"go.beyondstorage.io/v5/types"
+	"github.com/fastone-open/go-storage/types"
 )
 
 const defaultListObjectLimit = 100

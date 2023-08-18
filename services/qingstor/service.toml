@@ -17,7 +17,6 @@ optional = ["location"]
 optional = ["location"]
 
 [namespace.storage]
-features = ["virtual_dir", "virtual_link"]
 implement = ["appender", "copier", "direr", "fetcher", "linker", "mover", "multiparter", "storage_http_signer"]
 
 [namespace.storage.new]

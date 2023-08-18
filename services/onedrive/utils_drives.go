@@ -32,15 +32,15 @@ type onedriveClient struct {
 
 // Item is the basic definition of onedrive item.
 type Item struct {
-	ID                   string                    `json:"id"`
-	Name                 string                    `json:"name"`
-	Etag                 string                    `json:"eTag"`
-	LastModifiedDateTime time.Time                 `json:"lastModifiedDateTime"`
-	DownloadURL          string                    `json:"@microsoft.graph.downloadUrl"`
-	Size                 int64                     `json:"size"`
-	CreatedBy            CreatedBy                 `json:"createdBy"`
-	File                 *onedrive.DriveItemFile   `json:"file"`
-	Folder               *onedrive.DriveItemFolder `json:"folder"`
+	ID                   string                  `json:"id"`
+	Name                 string                  `json:"name"`
+	Etag                 string                  `json:"eTag"`
+	LastModifiedDateTime time.Time               `json:"lastModifiedDateTime"`
+	DownloadURL          string                  `json:"@microsoft.graph.downloadUrl"`
+	Size                 int64                   `json:"size"`
+	CreatedBy            CreatedBy               `json:"createdBy"`
+	File                 *onedrive.DriveItemFile `json:"file"`
+	Folder               *onedrive.DriveItem     `json:"folder"`
 }
 
 type CreatedBy struct {

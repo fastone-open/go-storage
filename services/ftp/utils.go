@@ -15,6 +15,7 @@ import (
 	ps "github.com/fastone-open/go-storage/pairs"
 	"github.com/fastone-open/go-storage/services"
 	"github.com/fastone-open/go-storage/types"
+	. "github.com/fastone-open/go-storage/types"
 )
 
 // Storage is the example client.

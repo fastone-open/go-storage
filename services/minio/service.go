@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/fastone-open/go-storage/types"
+	"github.com/minio/minio-go/v7"
 )
 
 func (s *Service) create(ctx context.Context, name string, opt pairServiceCreate) (store types.Storager, err error) {

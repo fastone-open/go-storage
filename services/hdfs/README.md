@@ -17,7 +17,7 @@ import (
 	"log"
 	
 	_ "go.beyondstorage.io/services/hdfs"
-	"go.beyondstorage.io/v5/services"
+	"github.com/fastone-open/go-storage/services"
 )
 
 func main() {

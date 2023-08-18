@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	. "go.beyondstorage.io/v5/types"
+	. "github.com/fastone-open/go-storage/types"
 )
 
 type Storage struct {
@@ -19,7 +19,7 @@ type Storage struct {
 	UnimplementedFetcher
 	UnimplementedMover
 	UnimplementedMultiparter
-	UnimplementedReacher
+	// UnimplementedReacher
 	UnimplementedAppender
 	UnimplementedStorager
 }
@@ -73,10 +73,6 @@ func (s *Storage) metadata(opt pairStorageMetadata) (meta *StorageMeta) {
 }
 
 func (s *Storage) move(ctx context.Context, src string, dst string, opt pairStorageMove) (err error) {
-	panic("not implemented")
-}
-
-func (s *Storage) reach(ctx context.Context, path string, opt pairStorageReach) (url string, err error) {
 	panic("not implemented")
 }
 

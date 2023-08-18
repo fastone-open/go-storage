@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/Xuanwo/gg"
 	"github.com/Xuanwo/templateutils"
 	log "github.com/sirupsen/logrus"
@@ -21,10 +22,10 @@ func generateSrv(data *Service, path string) {
 		AddPath("strings").
 		AddPath("time").
 		AddLine().
-		AddDot("go.beyondstorage.io/v5/pairs").
-		AddPath("go.beyondstorage.io/v5/pkg/httpclient").
-		AddPath("go.beyondstorage.io/v5/services").
-		AddDot("go.beyondstorage.io/v5/types")
+		AddDot("github.com/fastone-open/go-storage/pairs").
+		AddPath("github.com/fastone-open/go-storage/pkg/httpclient").
+		AddPath("github.com/fastone-open/go-storage/services").
+		AddDot("github.com/fastone-open/go-storage/types")
 
 	f.NewVar().
 		AddDecl("_", "Storager").
@@ -179,12 +180,12 @@ GetStorageSystemMetadata will get StorageSystemMetadata from Storage.
 				"_", interNameP, gg.S("&%s{}", nsNameP))
 		}
 
-		// Generate feature struct.
-		features := f.NewStruct(nsNameP + "Features")
-		for _, fs := range ns.ParsedFeatures() {
-			features.AddLineComment(fs.Description)
-			features.AddField(templateutils.ToPascal(fs.Name), "bool")
-		}
+		// // Generate feature struct.
+		// features := f.NewStruct(nsNameP + "Features")
+		// for _, fs := range ns.ParsedFeatures() {
+		// 	features.AddLineComment(fs.Description)
+		// 	features.AddField(templateutils.ToPascal(fs.Name), "bool")
+		// }
 
 		// Generate pair new.
 		fnNewNameP := templateutils.ToPascal(ns.New.Name)
@@ -315,13 +316,13 @@ GetStorageSystemMetadata will get StorageSystemMetadata from Storage.
 			gg.Return("result", "nil"),
 		)
 
-		// Generate default pairs.
-		f.AddLineComment("Default%sPairs is default pairs for specific action", nsNameP)
-		dps := f.NewStruct(fmt.Sprintf("Default%sPairs", nsNameP))
-		for _, fn := range ns.ParsedFunctions() {
-			fnNameP := templateutils.ToPascal(fn.Name)
-			dps.AddField(fnNameP, "[]Pair")
-		}
+		// // Generate default pairs.
+		// f.AddLineComment("Default%sPairs is default pairs for specific action", nsNameP)
+		// dps := f.NewStruct(fmt.Sprintf("Default%sPairs", nsNameP))
+		// for _, fn := range ns.ParsedFunctions() {
+		// 	fnNameP := templateutils.ToPascal(fn.Name)
+		// 	dps.AddField(fnNameP, "[]Pair")
+		// }
 
 		// Generate pair.
 		for _, fn := range ns.ParsedFunctions() {

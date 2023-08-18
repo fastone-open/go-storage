@@ -5,10 +5,30 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/fastone-open/go-storage/services"
+	"github.com/fastone-open/go-storage/types"
 	typ "github.com/fastone-open/go-storage/types"
 )
+
+var _ types.Servicer = &Service{}
+
+// Service is the qingstor service config.
+type Service struct {
+	typ.UnimplementedServicer
+
+	defaultPairs typ.DefaultServicePairs
+
+	workDir string
+	sync.RWMutex
+	buckets map[string]*Storage
+}
+
+// String implements Service.String.
+func (s *Service) String() string {
+	return fmt.Sprintf("Servicer qingstor {AccessKey: %s}", "")
+}
 
 // Std{in/out/err} support
 const (
@@ -17,13 +37,15 @@ const (
 	Stderr = "/dev/stderr"
 )
 
+var _ types.Storager = &Storage{}
+
 // Storage is the fs client.
 type Storage struct {
 	// options for this storager.
 	workDir string // workDir dir for all operation.
 
-	defaultPairs DefaultStoragePairs
-	features     StorageFeatures
+	features     typ.StorageFeatures
+	defaultPairs typ.DefaultStoragePairs
 
 	typ.UnimplementedStorager
 	typ.UnimplementedCopier
@@ -39,9 +61,53 @@ func (s *Storage) String() string {
 	return fmt.Sprintf("Storager fs {WorkDir: %s}", s.workDir)
 }
 
+// NewServicer will create Servicer only.
+func NewServicer(pairs ...typ.Pair) (typ.Servicer, error) {
+	return newServicer(pairs...)
+}
+
 // NewStorager will create Storager only.
 func NewStorager(pairs ...typ.Pair) (typ.Storager, error) {
-	return newStorager(pairs...)
+	_, store, err := newServicerAndStorager(pairs...)
+	return store, err
+}
+
+func newServicer(pairs ...typ.Pair) (srv *Service, err error) {
+	defer func() {
+		if err != nil {
+			err = services.InitError{Op: "new_servicer", Type: Type, Err: formatError(err), Pairs: pairs}
+		}
+	}()
+
+	opt, err := parsePairServiceNew(pairs)
+	if err != nil {
+		return
+	}
+
+	loc := os.TempDir()
+	if opt.HasWorkDir {
+		loc = opt.WorkDir
+	}
+	srv = &Service{
+		workDir: loc,
+		buckets: make(map[string]*Storage),
+	}
+	return
+}
+
+// New will create a new qingstor service.
+func newServicerAndStorager(pairs ...typ.Pair) (srv *Service, store *Storage, err error) {
+	srv, err = newServicer(pairs...)
+	if err != nil {
+		return
+	}
+
+	store, err = srv.newStorage(pairs...)
+	if err != nil {
+		err = services.InitError{Op: "new_storager", Type: Type, Err: formatError(err), Pairs: pairs}
+		return
+	}
+	return
 }
 
 // newStorager will create a fs client.

@@ -12,6 +12,7 @@ import (
 	"github.com/fastone-open/go-storage/pkg/iowrap"
 	"github.com/fastone-open/go-storage/services"
 	"github.com/fastone-open/go-storage/types"
+	"github.com/qingstor/go-mime"
 )
 
 func (s *Storage) delete(ctx context.Context, path string, opt pairStorageDelete) (err error) {

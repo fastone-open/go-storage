@@ -13,6 +13,9 @@ import (
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/option"
 
+	. "github.com/dgraph-io/ristretto"
+	"google.golang.org/api/drive/v3"
+
 	"github.com/fastone-open/go-storage/credential"
 	ps "github.com/fastone-open/go-storage/pairs"
 	"github.com/fastone-open/go-storage/services"

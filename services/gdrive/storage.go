@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"google.golang.org/api/drive/v3"
+
 	"github.com/fastone-open/go-storage/pkg/iowrap"
 	"github.com/fastone-open/go-storage/services"
 	"github.com/fastone-open/go-storage/types"

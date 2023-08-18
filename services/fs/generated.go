@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	. "go.beyondstorage.io/v5/pairs"
-	"go.beyondstorage.io/v5/pkg/httpclient"
-	"go.beyondstorage.io/v5/services"
-	. "go.beyondstorage.io/v5/types"
+	. "github.com/fastone-open/go-storage/pairs"
+	"github.com/fastone-open/go-storage/pkg/httpclient"
+	"github.com/fastone-open/go-storage/services"
+	. "github.com/fastone-open/go-storage/types"
 )
 
 var (
@@ -72,9 +72,19 @@ func setStorageSystemMetadata(s *StorageMeta, sm StorageSystemMetadata) {
 	s.SetSystemMetadata(sm)
 }
 
+// WithDefaultServicePairs will apply default_service_pairs value to Options.
+func WithDefaultServicePairs(v DefaultServicePairs) Pair {
+	return Pair{Key: "default_service_pairs", Value: v}
+}
+
 // WithDefaultStoragePairs will apply default_storage_pairs value to Options.
 func WithDefaultStoragePairs(v DefaultStoragePairs) Pair {
 	return Pair{Key: "default_storage_pairs", Value: v}
+}
+
+// WithServiceFeatures will apply service_features value to Options.
+func WithServiceFeatures(v ServiceFeatures) Pair {
+	return Pair{Key: "service_features", Value: v}
 }
 
 // WithStorageFeatures will apply storage_features value to Options.
@@ -82,7 +92,249 @@ func WithStorageFeatures(v StorageFeatures) Pair {
 	return Pair{Key: "storage_features", Value: v}
 }
 
-var pairMap = map[string]string{"content_md5": "string", "content_type": "string", "context": "context.Context", "continuation_token": "string", "credential": "string", "default_content_type": "string", "default_io_callback": "func([]byte)", "default_storage_pairs": "DefaultStoragePairs", "endpoint": "string", "expire": "time.Duration", "http_client_options": "*httpclient.Options", "interceptor": "Interceptor", "io_callback": "func([]byte)", "list_mode": "ListMode", "location": "string", "multipart_id": "string", "name": "string", "object_mode": "ObjectMode", "offset": "int64", "size": "int64", "storage_features": "StorageFeatures", "work_dir": "string"}
+var pairMap = map[string]string{"content_md5": "string", "content_type": "string", "context": "context.Context", "continuation_token": "string", "credential": "string", "default_content_type": "string", "default_io_callback": "func([]byte)", "default_service_pairs": "DefaultServicePairs", "default_storage_pairs": "DefaultStoragePairs", "endpoint": "string", "expire": "time.Duration", "http_client_options": "*httpclient.Options", "interceptor": "Interceptor", "io_callback": "func([]byte)", "list_mode": "ListMode", "location": "string", "multipart_id": "string", "name": "string", "object_mode": "ObjectMode", "offset": "int64", "service_features": "ServiceFeatures", "size": "int64", "storage_features": "StorageFeatures", "work_dir": "string"}
+var _ Servicer = &Service{}
+
+// pairServiceNew is the parsed struct
+type pairServiceNew struct {
+	pairs []Pair
+
+	// Required pairs
+	HasWorkDir bool
+	WorkDir    string
+	// Optional pairs
+	HasDefaultServicePairs bool
+	DefaultServicePairs    DefaultServicePairs
+	HasServiceFeatures     bool
+	ServiceFeatures        ServiceFeatures
+	// Enable features
+}
+
+// parsePairServiceNew will parse Pair slice into *pairServiceNew
+func parsePairServiceNew(opts []Pair) (pairServiceNew, error) {
+	result :=
+		pairServiceNew{pairs: opts}
+
+	for _, v := range opts {
+		switch v.Key {
+		case "work_dir":
+			if result.HasWorkDir {
+				continue
+			}
+			result.HasWorkDir = true
+			result.WorkDir = v.Value.(string)
+		case "default_service_pairs":
+			if result.HasDefaultServicePairs {
+				continue
+			}
+			result.HasDefaultServicePairs = true
+			result.DefaultServicePairs = v.Value.(DefaultServicePairs)
+		case "service_features":
+			if result.HasServiceFeatures {
+				continue
+			}
+			result.HasServiceFeatures = true
+			result.ServiceFeatures = v.Value.(ServiceFeatures)
+		}
+	}
+	// Enable features
+
+	// Default pairs
+
+	if !result.HasWorkDir {
+		return pairServiceNew{}, services.PairRequiredError{Keys: []string{"work_dir"}}
+	}
+	return result, nil
+}
+
+type pairServiceCreate struct {
+	pairs []Pair
+	// Required pairs
+	// Optional pairs
+	HasLocation bool
+	Location    string
+}
+
+func (s *Service) parsePairServiceCreate(opts []Pair) (pairServiceCreate, error) {
+	result :=
+		pairServiceCreate{pairs: opts}
+
+	for _, v := range opts {
+		switch v.Key {
+		case "location":
+			if result.HasLocation {
+				continue
+			}
+			result.HasLocation = true
+			result.Location = v.Value.(string)
+		default:
+			return pairServiceCreate{}, services.PairUnsupportedError{Pair: v}
+		}
+	}
+
+	return result, nil
+}
+
+type pairServiceDelete struct {
+	pairs []Pair
+	// Required pairs
+	// Optional pairs
+	HasLocation bool
+	Location    string
+}
+
+func (s *Service) parsePairServiceDelete(opts []Pair) (pairServiceDelete, error) {
+	result :=
+		pairServiceDelete{pairs: opts}
+
+	for _, v := range opts {
+		switch v.Key {
+		case "location":
+			if result.HasLocation {
+				continue
+			}
+			result.HasLocation = true
+			result.Location = v.Value.(string)
+		default:
+			return pairServiceDelete{}, services.PairUnsupportedError{Pair: v}
+		}
+	}
+
+	return result, nil
+}
+
+type pairServiceGet struct {
+	pairs []Pair
+	// Required pairs
+	// Optional pairs
+	HasLocation bool
+	Location    string
+}
+
+func (s *Service) parsePairServiceGet(opts []Pair) (pairServiceGet, error) {
+	result :=
+		pairServiceGet{pairs: opts}
+
+	for _, v := range opts {
+		switch v.Key {
+		case "location":
+			if result.HasLocation {
+				continue
+			}
+			result.HasLocation = true
+			result.Location = v.Value.(string)
+		default:
+			return pairServiceGet{}, services.PairUnsupportedError{Pair: v}
+		}
+	}
+
+	return result, nil
+}
+
+type pairServiceList struct {
+	pairs []Pair
+	// Required pairs
+	// Optional pairs
+	HasLocation bool
+	Location    string
+}
+
+func (s *Service) parsePairServiceList(opts []Pair) (pairServiceList, error) {
+	result :=
+		pairServiceList{pairs: opts}
+
+	for _, v := range opts {
+		switch v.Key {
+		case "location":
+			if result.HasLocation {
+				continue
+			}
+			result.HasLocation = true
+			result.Location = v.Value.(string)
+		default:
+			return pairServiceList{}, services.PairUnsupportedError{Pair: v}
+		}
+	}
+
+	return result, nil
+}
+func (s *Service) Create(name string, pairs ...Pair) (store Storager, err error) {
+	ctx := context.Background()
+	return s.CreateWithContext(ctx, name, pairs...)
+}
+func (s *Service) CreateWithContext(ctx context.Context, name string, pairs ...Pair) (store Storager, err error) {
+	defer func() {
+		err =
+			s.formatError("create", err, name)
+	}()
+
+	pairs = append(pairs, s.defaultPairs.Create...)
+	var opt pairServiceCreate
+
+	opt, err = s.parsePairServiceCreate(pairs)
+	if err != nil {
+		return
+	}
+	return s.create(ctx, name, opt)
+}
+func (s *Service) Delete(name string, pairs ...Pair) (err error) {
+	ctx := context.Background()
+	return s.DeleteWithContext(ctx, name, pairs...)
+}
+func (s *Service) DeleteWithContext(ctx context.Context, name string, pairs ...Pair) (err error) {
+	defer func() {
+		err =
+			s.formatError("delete", err, name)
+	}()
+
+	pairs = append(pairs, s.defaultPairs.Delete...)
+	var opt pairServiceDelete
+
+	opt, err = s.parsePairServiceDelete(pairs)
+	if err != nil {
+		return
+	}
+	return s.delete(ctx, name, opt)
+}
+func (s *Service) Get(name string, pairs ...Pair) (store Storager, err error) {
+	ctx := context.Background()
+	return s.GetWithContext(ctx, name, pairs...)
+}
+func (s *Service) GetWithContext(ctx context.Context, name string, pairs ...Pair) (store Storager, err error) {
+	defer func() {
+		err =
+			s.formatError("get", err, name)
+	}()
+
+	pairs = append(pairs, s.defaultPairs.Get...)
+	var opt pairServiceGet
+
+	opt, err = s.parsePairServiceGet(pairs)
+	if err != nil {
+		return
+	}
+	return s.get(ctx, name, opt)
+}
+func (s *Service) List(pairs ...Pair) (sti *StoragerIterator, err error) {
+	ctx := context.Background()
+	return s.ListWithContext(ctx, pairs...)
+}
+func (s *Service) ListWithContext(ctx context.Context, pairs ...Pair) (sti *StoragerIterator, err error) {
+	defer func() {
+		err =
+			s.formatError("list", err, "")
+	}()
+
+	pairs = append(pairs, s.defaultPairs.List...)
+	var opt pairServiceList
+
+	opt, err = s.parsePairServiceList(pairs)
+	if err != nil {
+		return
+	}
+	return s.list(ctx, opt)
+}
+
 var (
 	_ Appender = &Storage{}
 	_ Copier   = &Storage{}
@@ -93,14 +345,13 @@ var (
 	_ Storager = &Storage{}
 )
 
-type StorageFeatures struct {
-}
-
 // pairStorageNew is the parsed struct
 type pairStorageNew struct {
 	pairs []Pair
 
 	// Required pairs
+	HasName bool
+	Name    string
 	// Optional pairs
 	HasDefaultContentType  bool
 	DefaultContentType     string
@@ -122,6 +373,12 @@ func parsePairStorageNew(opts []Pair) (pairStorageNew, error) {
 
 	for _, v := range opts {
 		switch v.Key {
+		case "name":
+			if result.HasName {
+				continue
+			}
+			result.HasName = true
+			result.Name = v.Value.(string)
 		case "default_content_type":
 			if result.HasDefaultContentType {
 				continue
@@ -166,28 +423,12 @@ func parsePairStorageNew(opts []Pair) (pairStorageNew, error) {
 		result.DefaultStoragePairs.Read = append(result.DefaultStoragePairs.Read, WithIoCallback(result.DefaultIoCallback))
 		result.DefaultStoragePairs.Write = append(result.DefaultStoragePairs.Write, WithIoCallback(result.DefaultIoCallback))
 	}
-
+	if !result.HasName {
+		return pairStorageNew{}, services.PairRequiredError{Keys: []string{"name"}}
+	}
 	return result, nil
 }
 
-// DefaultStoragePairs is default pairs for specific action
-type DefaultStoragePairs struct {
-	CommitAppend []Pair
-	Copy         []Pair
-	Create       []Pair
-	CreateAppend []Pair
-	CreateDir    []Pair
-	CreateLink   []Pair
-	Delete       []Pair
-	Fetch        []Pair
-	List         []Pair
-	Metadata     []Pair
-	Move         []Pair
-	Read         []Pair
-	Stat         []Pair
-	Write        []Pair
-	WriteAppend  []Pair
-}
 type pairStorageCommitAppend struct {
 	pairs []Pair
 	// Required pairs
@@ -853,6 +1094,7 @@ func (s *Storage) WriteAppendWithContext(ctx context.Context, o *Object, r io.Re
 	return s.writeAppend(ctx, o, r, size, opt)
 }
 func init() {
+	services.RegisterServicer(Type, NewServicer)
 	services.RegisterStorager(Type, NewStorager)
 	services.RegisterSchema(Type, pairMap)
 }
