@@ -18,7 +18,7 @@ require (
 	github.com/aws/smithy-go v1.13.5
 	github.com/baidubce/bce-sdk-go v0.9.151
 	github.com/colinmarc/hdfs/v2 v2.3.0
-	github.com/dave/dst v0.26.2
+	github.com/dave/dst v0.27.2
 	github.com/dropbox/dropbox-sdk-go-unofficial/v6 v6.0.5
 	github.com/goh-chunlin/go-onedrive/onedrive v0.0.0-20201229161802-ea6494991717
 	github.com/golang/mock v1.6.0
