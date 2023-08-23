@@ -11,8 +11,16 @@ var Metadata = def.Metadata{
 	Infos: []def.Info{},
 	Factory: []def.Pair{
 		def.PairWorkDir,
+		def.PairName,
 	},
-	Service: def.Service{},
+	Service: def.Service{
+		Features: types.ServiceFeatures{
+			Create: true,
+			Delete: true,
+			Get:    true,
+			List:   true,
+		},
+	},
 	Storage: def.Storage{
 		Features: types.StorageFeatures{
 			WriteEmptyObject: true,

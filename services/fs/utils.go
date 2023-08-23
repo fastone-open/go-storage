@@ -27,7 +27,7 @@ type Service struct {
 
 // String implements Service.String.
 func (s *Service) String() string {
-	return fmt.Sprintf("Servicer qingstor {AccessKey: %s}", "")
+	return fmt.Sprintf("Servicer fs {WorkDir: %s}", s.workDir)
 }
 
 // Std{in/out/err} support

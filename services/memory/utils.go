@@ -1,9 +1,12 @@
 package memory
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/fastone-open/go-storage/services"
 	"github.com/fastone-open/go-storage/types"
@@ -17,12 +20,14 @@ type Service struct {
 	defaultPairs types.DefaultServicePairs
 	features     types.ServiceFeatures
 
+	sync.RWMutex
+	buckets map[string]*Storage
 	types.UnimplementedServicer
 }
 
 // String implements Servicer.String
 func (s *Service) String() string {
-	return fmt.Sprintf("Servicer memory")
+	return "Servicer memory"
 }
 
 // NewServicer is not usable, only for generate code
@@ -37,7 +42,11 @@ func NewServicer(pairs ...types.Pair) (types.Servicer, error) {
 
 // newService is not usable, only for generate code
 func (f *Factory) newService() (srv *Service, err error) {
-	srv = &Service{}
+	srv = &Service{
+		f:        *f,
+		features: f.serviceFeatures(),
+		buckets:  make(map[string]*Storage),
+	}
 	return
 }
 
@@ -56,7 +65,7 @@ type Storage struct {
 
 // String implements Storager.String
 func (s *Storage) String() string {
-	return "memory"
+	return fmt.Sprintf("memory[%s]:%s", s.f.Name, s.workDir)
 }
 
 // NewStorager will create Storager only.
@@ -89,6 +98,22 @@ func (s *Storage) formatError(op string, err error, path ...string) error {
 	}
 
 	return err
+}
+
+func formatError(err error) error {
+	if _, ok := err.(services.InternalError); ok {
+		return err
+	}
+
+	// Handle error returned by os package.
+	switch {
+	case errors.Is(err, os.ErrNotExist):
+		return fmt.Errorf("%w: %v", services.ErrObjectNotExist, err)
+	case errors.Is(err, os.ErrPermission):
+		return fmt.Errorf("%w: %v", services.ErrPermissionDenied, err)
+	default:
+		return fmt.Errorf("%w: %v", services.ErrUnexpected, err)
+	}
 }
 
 func (s *Storage) absPath(p string) string {
