@@ -71,6 +71,7 @@ func setStorageSystemMetadata(s *types.StorageMeta, sm StorageSystemMetadata) {
 }
 
 type Factory struct {
+	Name    string
 	WorkDir string
 }
 
@@ -98,7 +99,13 @@ func (f *Factory) FromString(conn string) (err error) {
 
 	}
 	if partStorage != "" {
-		f.WorkDir = partStorage
+		slash := strings.IndexByte(partStorage[1:], '/')
+		if slash == -1 {
+			f.Name = partStorage[1:]
+		} else {
+			f.Name, f.WorkDir = partStorage[1:slash+1], partStorage[slash+1:]
+		}
+
 	}
 	if partParams != "" {
 		xs := strings.Split(partParams, "&")
@@ -110,6 +117,8 @@ func (f *Factory) FromString(conn string) (err error) {
 				value = vs[1]
 			}
 			switch key {
+			case "name":
+				f.Name = value
 			case "work_dir":
 				f.WorkDir = value
 			}
@@ -120,6 +129,8 @@ func (f *Factory) FromString(conn string) (err error) {
 func (f *Factory) WithPairs(ps ...types.Pair) (err error) {
 	for _, v := range ps {
 		switch v.Key {
+		case "name":
+			f.Name = v.Value.(string)
 		case "work_dir":
 			f.WorkDir = v.Value.(string)
 		}
@@ -136,6 +147,10 @@ func (f *Factory) NewStorager() (sto types.Storager, err error) {
 	return f.newStorage()
 }
 func (f *Factory) serviceFeatures() (s types.ServiceFeatures) {
+	s.Create = true
+	s.Delete = true
+	s.Get = true
+	s.List = true
 	return
 }
 func (f *Factory) storageFeatures() (s types.StorageFeatures) {
@@ -185,12 +200,22 @@ func (s *Service) parsePairServiceCreate(opts []types.Pair) (pairServiceCreate, 
 	return result, nil
 }
 func (s *Service) Create(name string, pairs ...types.Pair) (store types.Storager, err error) {
-	err = types.NewOperationNotImplementedError("create")
-	return
+	ctx := context.Background()
+	return s.CreateWithContext(ctx, name, pairs...)
 }
 func (s *Service) CreateWithContext(ctx context.Context, name string, pairs ...types.Pair) (store types.Storager, err error) {
-	err = types.NewOperationNotImplementedError("create")
-	return
+	defer func() {
+		err =
+			s.formatError("create", err, name)
+	}()
+	pairs = append(pairs, s.defaultPairs.Create...)
+	var opt pairServiceCreate
+
+	opt, err = s.parsePairServiceCreate(pairs)
+	if err != nil {
+		return
+	}
+	return s.create(ctx, name, opt)
 }
 
 type pairServiceDelete struct {
@@ -210,12 +235,22 @@ func (s *Service) parsePairServiceDelete(opts []types.Pair) (pairServiceDelete, 
 	return result, nil
 }
 func (s *Service) Delete(name string, pairs ...types.Pair) (err error) {
-	err = types.NewOperationNotImplementedError("delete")
-	return
+	ctx := context.Background()
+	return s.DeleteWithContext(ctx, name, pairs...)
 }
 func (s *Service) DeleteWithContext(ctx context.Context, name string, pairs ...types.Pair) (err error) {
-	err = types.NewOperationNotImplementedError("delete")
-	return
+	defer func() {
+		err =
+			s.formatError("delete", err, name)
+	}()
+	pairs = append(pairs, s.defaultPairs.Delete...)
+	var opt pairServiceDelete
+
+	opt, err = s.parsePairServiceDelete(pairs)
+	if err != nil {
+		return
+	}
+	return s.delete(ctx, name, opt)
 }
 
 type pairServiceGet struct {
@@ -235,12 +270,22 @@ func (s *Service) parsePairServiceGet(opts []types.Pair) (pairServiceGet, error)
 	return result, nil
 }
 func (s *Service) Get(name string, pairs ...types.Pair) (store types.Storager, err error) {
-	err = types.NewOperationNotImplementedError("get")
-	return
+	ctx := context.Background()
+	return s.GetWithContext(ctx, name, pairs...)
 }
 func (s *Service) GetWithContext(ctx context.Context, name string, pairs ...types.Pair) (store types.Storager, err error) {
-	err = types.NewOperationNotImplementedError("get")
-	return
+	defer func() {
+		err =
+			s.formatError("get", err, name)
+	}()
+	pairs = append(pairs, s.defaultPairs.Get...)
+	var opt pairServiceGet
+
+	opt, err = s.parsePairServiceGet(pairs)
+	if err != nil {
+		return
+	}
+	return s.get(ctx, name, opt)
 }
 
 type pairServiceList struct {
@@ -260,12 +305,22 @@ func (s *Service) parsePairServiceList(opts []types.Pair) (pairServiceList, erro
 	return result, nil
 }
 func (s *Service) List(pairs ...types.Pair) (sti *types.StoragerIterator, err error) {
-	err = types.NewOperationNotImplementedError("list")
-	return
+	ctx := context.Background()
+	return s.ListWithContext(ctx, pairs...)
 }
 func (s *Service) ListWithContext(ctx context.Context, pairs ...types.Pair) (sti *types.StoragerIterator, err error) {
-	err = types.NewOperationNotImplementedError("list")
-	return
+	defer func() {
+		err =
+			s.formatError("list", err, "")
+	}()
+	pairs = append(pairs, s.defaultPairs.List...)
+	var opt pairServiceList
+
+	opt, err = s.parsePairServiceList(pairs)
+	if err != nil {
+		return
+	}
+	return s.list(ctx, opt)
 }
 
 var _ types.Storager = &Storage{}

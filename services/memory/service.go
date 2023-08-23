@@ -2,59 +2,81 @@ package memory
 
 import (
 	"context"
-	"errors"
-	"sync"
+	"path"
 
+	"github.com/fastone-open/go-storage/services"
 	"github.com/fastone-open/go-storage/types"
 )
 
-var _ types.Servicer = &BucketService{}
-
-type BucketService struct {
-	types.UnimplementedServicer
-	sync.RWMutex
-	buckets map[string]types.Storager
-}
-
-func NewBucketService() types.Servicer {
-	return &BucketService{
-		buckets: make(map[string]types.Storager),
+func (s *Service) create(ctx context.Context, name string, opt pairServiceCreate) (store types.Storager, err error) {
+	// ServicePairCreate requires location, so we don't need to add location into pairs
+	// pairs := append(opt.pairs, ps.WithName(name))
+	st, err := s.newStorage(name)
+	if err != nil {
+		return
 	}
+
+	s.Lock()
+	defer s.Unlock()
+	s.buckets[name] = st
+	return st, nil
 }
 
-func (m *BucketService) String() string {
-	return "BucketService"
-}
-func (m *BucketService) Create(name string, pairs ...types.Pair) (store types.Storager, err error) {
-	m.Lock()
-	defer m.Unlock()
-	if _, found := m.buckets[name]; found {
-		return nil, errors.New("bucket already exists")
-	}
-	sto, err := NewStorager(pairs...)
-	m.buckets[name] = sto
-	return sto, err
-}
-func (m *BucketService) CreateWithContext(ctx context.Context, name string, pairs ...types.Pair) (store types.Storager, err error) {
-	return m.Create(name, pairs...)
-}
-func (m *BucketService) Delete(name string, pairs ...types.Pair) (err error) {
-	m.Lock()
-	defer m.Unlock()
-	delete(m.buckets, name)
+func (s *Service) delete(ctx context.Context, name string, opt pairServiceDelete) (err error) {
+	s.Lock()
+	defer s.Unlock()
+	delete(s.buckets, name)
 	return nil
 }
-func (m *BucketService) DeleteWithContext(ctx context.Context, name string, pairs ...types.Pair) (err error) {
-	return m.Delete(name, pairs...)
-}
-func (m *BucketService) Get(name string, pairs ...types.Pair) (store types.Storager, err error) {
-	m.RLock()
-	defer m.RUnlock()
-	if sto, found := m.buckets[name]; found {
-		return sto, nil
+
+func (s *Service) formatError(op string, err error, name string) error {
+	if err == nil {
+		return nil
 	}
-	return nil, errors.New("bucket not found")
+
+	return services.ServiceError{
+		Op:       op,
+		Err:      formatError(err),
+		Servicer: s,
+		Name:     name,
+	}
 }
-func (m *BucketService) GetWithContext(ctx context.Context, name string, pairs ...types.Pair) (store types.Storager, err error) {
-	return m.Get(name, pairs...)
+
+func (s *Service) get(ctx context.Context, name string, opt pairServiceGet) (store types.Storager, err error) {
+	store, err = s.newStorage(name)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (s *Service) list(ctx context.Context, opt pairServiceList) (it *types.StoragerIterator, err error) {
+	return types.NewStoragerIterator(ctx, s.nextStoragePage, nil), nil
+}
+
+func (s *Service) newStorage(name string) (store *Storage, err error) {
+	s.Lock()
+	defer s.Unlock()
+	store, ok := s.buckets[name]
+	if ok {
+		return store, nil
+	}
+
+	store = &Storage{
+		f:       s.f,
+		workDir: path.Join(s.f.WorkDir, name),
+	}
+	return store, nil
+}
+
+func (s *Service) nextStoragePage(ctx context.Context, page *types.StoragerPage) error {
+	for name := range s.buckets {
+		store, err := s.newStorage(name)
+		if err != nil {
+			return err
+		}
+		page.Data = append(page.Data, store)
+	}
+
+	return types.IterateDone
 }
